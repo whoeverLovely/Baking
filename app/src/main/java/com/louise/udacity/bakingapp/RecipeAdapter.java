@@ -45,16 +45,8 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Recipe recipe = mRecipes.get(position);
-        /*Drawable recipeImage = mContext.getResources()
-                .getDrawable(mContext.getResources().getIdentifier(recipe.getName(),
-                        "drawable",
-                        mContext.getPackageName()));
-        holder.recipeImage.setImageDrawable(recipeImage);*/
-        Timber.d("recipe name: " + recipe.getName());
         holder.recipeNameText.setText(recipe.getName());
-        Timber.d(String.valueOf(recipe.getServings()));
         holder.servingsText.setText(String.valueOf(recipe.getServings()));
-
     }
 
     @Override

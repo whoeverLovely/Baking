@@ -1,5 +1,7 @@
 package com.louise.udacity.bakingapp;
 
+import android.app.IntentService;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,6 +35,9 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
     ProgressBar progressBar;
 
     RecipeAdapter recipeAdapter;
+    List<Recipe> recipes;
+
+    public static final String EXTRA_RECIPE= "recipe";
 
     public static final String URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
@@ -53,12 +58,13 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
 
     private void setRecipeData() {
 
+        Timber.d("Started fetch data...");
         progressBar.setVisibility(View.VISIBLE);
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
                 Timber.d("recipe json received: " + response.toString());
-                List<Recipe> recipes = new Gson().fromJson(response.toString(), new TypeToken<List<Recipe>>() {
+                recipes = new Gson().fromJson(response.toString(), new TypeToken<List<Recipe>>() {
                 }.getType());
                 recipeAdapter.swapData(recipes);
                 progressBar.setVisibility(View.INVISIBLE);
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
             public void onErrorResponse(VolleyError error) {
                 Toast.makeText(MainActivity.this, error.toString(), Toast.LENGTH_LONG).show();
                 progressBar.setVisibility(View.INVISIBLE);
+                error.printStackTrace();
             }
         });
 
@@ -79,6 +86,11 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
 
     @Override
     public void onItemClick(View view, int position) {
+        Recipe recipe = recipes.get(position);
+
+        Intent intent = new Intent(this, RecipeDetailActivity.class);
+        intent.putExtra(EXTRA_RECIPE, recipe);
+        startActivity(intent);
 
     }
 }
