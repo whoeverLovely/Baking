@@ -2,10 +2,8 @@ package com.louise.udacity.bakingapp;
 
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +11,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.louise.udacity.bakingapp.data.Recipe;
+import com.louise.udacity.bakingapp.util.ItemClickListener;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import timber.log.Timber;
 
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder> {
     private ItemClickListener mItemClickListener;

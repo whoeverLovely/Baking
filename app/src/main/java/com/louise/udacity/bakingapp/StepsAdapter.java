@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.louise.udacity.bakingapp.data.Step;
+import com.louise.udacity.bakingapp.util.ItemClickListener;
 
 import java.util.List;
 

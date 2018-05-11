@@ -54,4 +54,7 @@ dependencies {
     // Dependencies for ExoPlayer
     implementation 'com.google.android.exoplayer:exoplayer:2.8.0'
 
+    /*implementation 'com.google.guava:guava:25.0-android'*/
+
+
 }

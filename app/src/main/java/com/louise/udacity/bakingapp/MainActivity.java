@@ -1,12 +1,10 @@
 package com.louise.udacity.bakingapp;
 
-import android.app.IntentService;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -17,6 +15,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.louise.udacity.bakingapp.data.Recipe;
+import com.louise.udacity.bakingapp.util.ItemClickListener;
 import com.louise.udacity.bakingapp.util.MySingletonVolley;
 
 import org.json.JSONArray;

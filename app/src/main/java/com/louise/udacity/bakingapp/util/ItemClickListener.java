@@ -1,4 +1,4 @@
-package com.louise.udacity.bakingapp;
+package com.louise.udacity.bakingapp.util;
 
 import android.view.View;
 

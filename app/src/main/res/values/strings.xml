@@ -4,4 +4,7 @@
     <string name="recipe_image">recipe image</string>
     <string name="ingredients">Ingredients</string>
     <string name="steps">Steps</string>
+    <string name="next_step">Next Step</string>
+    <string name="the_last_step">This is the last step!</string>
+    <string name="no_video_available_fot_this_step">No video available for this step!</string>
 </resources>
