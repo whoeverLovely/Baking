@@ -1,5 +1,6 @@
 package com.louise.udacity.bakingapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -36,7 +37,24 @@ public class RecipeDetailFragment extends Fragment implements ItemClickListener 
     public static final String EXTRA_BUNDLE_STEPS = "bundleSteps";
     public static final String EXTRA_INDEX = "index";
 
+    OnStepClickedListener onStepClickedListener;
+
+    public interface OnStepClickedListener{
+        public void onStepSelected(int position);
+    }
+
     public RecipeDetailFragment() {
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            onStepClickedListener = (OnStepClickedListener)context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement OnStepClickedListener");
+        }
     }
 
     @Nullable
@@ -69,11 +87,13 @@ public class RecipeDetailFragment extends Fragment implements ItemClickListener 
 
         Timber.d("the step is clicked.");
 
-        Intent intent = new Intent(getActivity(), StepDetailActivity.class);
+        onStepClickedListener.onStepSelected(position);
+
+        /*Intent intent = new Intent(getActivity(), StepDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(BUNDLE_STEPS, (ArrayList<Step>) steps);
         intent.putExtra(EXTRA_BUNDLE_STEPS, bundle);
         intent.putExtra(EXTRA_INDEX, position);
-        startActivity(intent);
+        startActivity(intent);*/
     }
 }

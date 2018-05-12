@@ -8,9 +8,12 @@ import android.os.Bundle;
 
 import com.louise.udacity.bakingapp.data.Step;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;
+
+import static com.louise.udacity.bakingapp.RecipeDetailFragment.BUNDLE_STEPS;
 
 public class StepDetailActivity extends AppCompatActivity {
 
@@ -24,6 +27,7 @@ public class StepDetailActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra(RecipeDetailFragment.EXTRA_BUNDLE_STEPS);
         int index = intent.getIntExtra(RecipeDetailFragment.EXTRA_INDEX, -1);
+        ArrayList<Step> steps = bundle.getParcelableArrayList(BUNDLE_STEPS);
 
         Timber.d("Here is activity onCreate");
         stepDetailFragment = new StepDetailFragment();
@@ -34,10 +38,11 @@ public class StepDetailActivity extends AppCompatActivity {
             Timber.d("savedInstanceState in activity onCreate is not null");
             //Restore the fragment's instance
             stepDetailFragment = (StepDetailFragment) fragmentManager.getFragment(savedInstanceState, StepDetailFragment.class.getSimpleName());
+            stepDetailFragment.setSteps(steps);
         } else {
             Timber.d("savedInstanceState in activity onCreate is null");
-            bundle.putInt(RecipeDetailFragment.EXTRA_INDEX, index);
-            stepDetailFragment.setArguments(bundle);
+            stepDetailFragment.setIndex(index);
+            stepDetailFragment.setSteps(steps);
             fragmentManager.beginTransaction()
                     .add(R.id.frameLayout_step_detail, stepDetailFragment)
                     .commit();

@@ -1,6 +1,7 @@
 package com.louise.udacity.bakingapp;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -17,8 +18,10 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.exoplayer2.C;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -59,7 +62,7 @@ public class StepDetailFragment extends Fragment {
     TextView noVideoTextView;
 
     @BindView(R.id.playerView_frame)
-            FrameLayout playerFrame;
+    FrameLayout playerFrame;
 
     FrameLayout mFullScreenButton;
 
@@ -69,33 +72,23 @@ public class StepDetailFragment extends Fragment {
     SimpleExoPlayer player;
     ExtractorMediaSource.Factory mediaSourceFactory;
     private ImageView mFullScreenIcon;
-    private int mResumeWindow;
-    private long mResumePosition;
 
     private List<Step> steps;
     private Step currentStep;
     private int index;
     private boolean hasVideo;
 
-    private final static String BUNDLE_INDEX = "currentIndex";
+    public final static String BUNDLE_INDEX = "currentIndex";
 
     public StepDetailFragment() {
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
+    }
 
-        Timber.d("here is fragment onCreate");
-        steps = getArguments().getParcelableArrayList(RecipeDetailFragment.BUNDLE_STEPS);
-        if (savedInstanceState == null) {
-            index = getArguments().getInt(RecipeDetailFragment.EXTRA_INDEX);
-        } else {
-            index = savedInstanceState.getInt(BUNDLE_INDEX);
-        }
-
-        Timber.d("the index at the end of fragment onCreate is %s", index);
-
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     @Nullable
@@ -105,8 +98,30 @@ public class StepDetailFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_step_detail, container, false);
         ButterKnife.bind(this, rootView);
 
-        currentStep = steps.get(index);
+        initFullscreenDialog();
+        initFullscreenButton();
 
+        if (savedInstanceState != null) {
+            index = savedInstanceState.getInt(BUNDLE_INDEX);
+        }
+
+        return rootView;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        /*steps = getArguments().getParcelableArrayList(RecipeDetailFragment.BUNDLE_STEPS);*/
+       /* if (savedInstanceState == null) {
+            index = getArguments().getInt(RecipeDetailFragment.EXTRA_INDEX);
+        } else {
+            index = savedInstanceState.getInt(BUNDLE_INDEX);
+        }*/
+       /*if(savedInstanceState != null)
+           index = savedInstanceState.getInt(BUNDLE_INDEX);*/
+
+        currentStep = steps.get(index);
         initializePlayer();
         setStepViews(currentStep);
 
@@ -129,86 +144,43 @@ public class StepDetailFragment extends Fragment {
 
                 currentStep = steps.get(index);
                 setStepViews(currentStep);
-
             }
         });
         Timber.d("index in onCreateVIew is %s", index);
 
-        initFullscreenDialog();
-        initFullscreenButton();
-
-        return rootView;
-    }
-
-    /*@Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        if(savedInstanceState != null) {
-            index = savedInstanceState.getInt(BUNDLE_INDEX);
+        if (mExoPlayerFullscreen && hasVideo) {
+            openFullscreenDialog();
         }
-        Timber.d("index in onActivityCreated is %s", index);
-    }*/
-
-    private void initializePlayer() {
-        // Create a default TrackSelector
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        TrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        // Create the player
-        player =
-                ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
-
-        // Bind the player to the view.
-        stepVideoPlayerView.setPlayer(player);
-
-        // Produces DataSource instances through which media data is loaded.
-        ApplicationInfo applicationInfo = getActivity().getApplicationInfo();
-        int stringId = applicationInfo.labelRes;
-        String appName = stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : getActivity().getString(stringId);
-
-        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
-                Util.getUserAgent(getActivity(), appName));
-
-        mediaSourceFactory = new ExtractorMediaSource.Factory(dataSourceFactory);
-
-        /*boolean haveResumePosition = mResumeWindow != C.INDEX_UNSET;
-
-        if (haveResumePosition) {
-            player.seekTo(mResumeWindow, mResumePosition);
-        }*/
     }
 
 
-    private void setStepViews(Step step) {
-        String url = step.getVideoURL();
-        Timber.d("video url in step detail fragment is %s", url);
-        if ("".equals(url)) {
-            Timber.d("url is empty");
-            hasVideo = false;
-            noVideoTextView.setVisibility(View.VISIBLE);
-            stepVideoPlayerView.setVisibility(View.GONE);
-        } else {
-            hasVideo = true;
-            noVideoTextView.setVisibility(View.GONE);
-            stepVideoPlayerView.setVisibility(View.VISIBLE);
-            MediaSource mediaSource = mediaSourceFactory.createMediaSource(Uri.parse(url));
-            player.prepare(mediaSource);
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Timber.d("orientation changed");
+        Timber.d("newConfig.orientation: " + newConfig.orientation);
+        Timber.d("mExoPlayerFullscreen: " + mExoPlayerFullscreen);
+        Timber.d("hasVideo " + hasVideo);
+        // Checks the orientation of the screen
+        // When the video is not full screen and new Congfin is landscape and the video source is available, update to full screen mode
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE && !mExoPlayerFullscreen && hasVideo) {
+            openFullscreenDialog();
+            Timber.d("should be full screen!!!!!!!!!!!!!!!");
         }
-
-        // Set description
-        descriptionTextView.setText(step.getDescription());
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-
         Timber.d("the index saved is %s", index);
         outState.putInt(BUNDLE_INDEX, index);
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        player.release();
     }
 
     private void initFullscreenDialog() {
@@ -254,5 +226,59 @@ public class StepDetailFragment extends Fragment {
                     closeFullscreenDialog();
             }
         });
+    }
+
+    private void initializePlayer() {
+        // Create a default TrackSelector
+        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        // Create the player
+        player =
+                ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector);
+
+        // Bind the player to the view.
+        stepVideoPlayerView.setPlayer(player);
+        player.setPlayWhenReady(true);
+
+        // Produces DataSource instances through which media data is loaded.
+        ApplicationInfo applicationInfo = getActivity().getApplicationInfo();
+        int stringId = applicationInfo.labelRes;
+        String appName = stringId == 0 ? applicationInfo.nonLocalizedLabel.toString() : getActivity().getString(stringId);
+
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(getActivity(),
+                Util.getUserAgent(getActivity(), appName));
+
+        mediaSourceFactory = new ExtractorMediaSource.Factory(dataSourceFactory);
+    }
+
+
+    private void setStepViews(Step step) {
+        String url = step.getVideoURL();
+        Timber.d("video url in step detail fragment is %s", url);
+        if ("".equals(url)) {
+            Timber.d("url is empty");
+            hasVideo = false;
+            noVideoTextView.setVisibility(View.VISIBLE);
+            stepVideoPlayerView.setVisibility(View.GONE);
+        } else {
+            hasVideo = true;
+            noVideoTextView.setVisibility(View.GONE);
+            stepVideoPlayerView.setVisibility(View.VISIBLE);
+            MediaSource mediaSource = mediaSourceFactory.createMediaSource(Uri.parse(url));
+            player.prepare(mediaSource);
+        }
+
+        // Set description
+        descriptionTextView.setText(step.getDescription());
+    }
+
+    public void setNextStepButtonVisibility(int visibility) {
+        if (nextStepButton == null)
+            nextStepButton = getActivity().findViewById(R.id.button_next_step);
+        nextStepButton.setVisibility(visibility);
     }
 }
