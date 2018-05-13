@@ -1,12 +1,17 @@
 package com.louise.udacity.bakingapp;
 
+import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import com.android.volley.Response;
@@ -14,12 +19,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.louise.udacity.bakingapp.data.Ingredient;
 import com.louise.udacity.bakingapp.data.Recipe;
 import com.louise.udacity.bakingapp.util.ItemClickListener;
 import com.louise.udacity.bakingapp.util.MySingletonVolley;
 
 import org.json.JSONArray;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -92,7 +99,22 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         startActivity(intent);
 
         // Update widget
-        IngredientsAppWidget.updateIngredientsWidgets(this, recipe);
+        Intent widgetIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+        widgetIntent.putExtra(EXTRA_RECIPE, recipe);
+        intent.setComponent(new ComponentName(this, MyWidgetProvider.class));
+        LocalBroadcastManager.getInstance(this).sendBroadcast(widgetIntent);
 
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        int[] appWidgetIds = appWidgetManager.getAppWidgetIds(new ComponentName(this, MyWidgetProvider.class));
+        RemoteViews views = new RemoteViews(getPackageName(), R.layout.my_app_widget);
+        views.setTextViewText(R.id.widgetTitleLabel, recipe.getName());
+
+        Intent clickIntent = new Intent(this, RecipeDetailActivity.class);
+        intent.putExtra(MainActivity.EXTRA_RECIPE, recipe);
+        PendingIntent clickPI = PendingIntent.getActivity(this, 0, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        views.setOnClickPendingIntent(R.id.widget_list_view_frame, clickPI);
+
+        appWidgetManager.updateAppWidget(appWidgetIds, views);
     }
+
 }

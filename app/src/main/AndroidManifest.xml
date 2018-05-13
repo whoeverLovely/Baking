@@ -26,18 +26,21 @@
             android:name=".StepDetailActivity"
             android:configChanges="orientation|screenSize" />
 
-        <receiver android:name=".IngredientsAppWidget">
+        <receiver android:name=".MyWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/ingredients_app_widget_info" />
+                android:resource="@xml/my_widget_info" />
 
             <meta-data android:name="LauncherMetadata.Requirements.Scrollable"
                 android:value="true" />
         </receiver>
+
+        <service android:name=".MyWidgetRemoteViewService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 
 </manifest>

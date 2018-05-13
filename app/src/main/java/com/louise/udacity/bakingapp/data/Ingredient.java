@@ -70,14 +70,9 @@ public class Ingredient implements Parcelable {
         }
     };
 
-    public static String getIngredientsString(List<Ingredient> ingredients) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for(Ingredient ingredient : ingredients) {
-            String ingredientItem = String.valueOf(ingredient.getQuantity()) + " "
-                    + ingredient.getMeasure() + " "
-                    + ingredient.getIngredient() + "\n";
-            stringBuilder.append(ingredientItem);
-        }
-        return  stringBuilder.toString();
+    public static String getIngredientString(Ingredient ingredient) {
+        return  String.valueOf(ingredient.getQuantity()) + " "
+                + ingredient.getMeasure() + " "
+                + ingredient.getIngredient();
     }
 }
