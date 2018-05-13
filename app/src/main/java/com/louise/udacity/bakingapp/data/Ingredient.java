@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class Ingredient implements Parcelable {
 
@@ -68,4 +69,15 @@ public class Ingredient implements Parcelable {
             return new Ingredient[size];
         }
     };
+
+    public static String getIngredientsString(List<Ingredient> ingredients) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for(Ingredient ingredient : ingredients) {
+            String ingredientItem = String.valueOf(ingredient.getQuantity()) + " "
+                    + ingredient.getMeasure() + " "
+                    + ingredient.getIngredient() + "\n";
+            stringBuilder.append(ingredientItem);
+        }
+        return  stringBuilder.toString();
+    }
 }

@@ -91,5 +91,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         intent.putExtra(EXTRA_RECIPE, recipe);
         startActivity(intent);
 
+        // Update widget
+        IngredientsAppWidget.updateIngredientsWidgets(this, recipe);
+
     }
 }

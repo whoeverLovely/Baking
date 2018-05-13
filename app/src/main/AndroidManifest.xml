@@ -19,11 +19,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".RecipeDetailActivity"
-            android:configChanges="orientation"/>
+        <activity
+            android:name=".RecipeDetailActivity"
+            android:configChanges="orientation" />
         <activity
             android:name=".StepDetailActivity"
             android:configChanges="orientation|screenSize" />
+
+        <receiver android:name=".IngredientsAppWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ingredients_app_widget_info" />
+
+            <meta-data android:name="LauncherMetadata.Requirements.Scrollable"
+                android:value="true" />
+        </receiver>
     </application>
 
 </manifest>
