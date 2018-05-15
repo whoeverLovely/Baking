@@ -23,6 +23,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
     private Context mContext;
     private List<Recipe> mRecipes;
 
+
     public RecipeAdapter(Context context, ItemClickListener itemClickListener) {
         mContext = context;
         mItemClickListener = itemClickListener;
@@ -45,6 +46,7 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
         Recipe recipe = mRecipes.get(position);
         holder.recipeNameText.setText(recipe.getName());
         holder.servingsText.setText(String.valueOf(recipe.getServings()));
+
     }
 
     @Override
@@ -71,6 +73,10 @@ public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder
             if (mItemClickListener != null)
                 mItemClickListener.onItemClick(v, getAdapterPosition());
         }
+    }
+
+    public List<Recipe> getRecipeList() {
+        return mRecipes;
     }
 
 }

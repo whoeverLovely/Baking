@@ -1,4 +1,4 @@
-package com.louise.udacity.bakingapp;
+package com.louise.udacity.bakingapp.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
 
-import com.louise.udacity.bakingapp.data.Ingredient;
+import com.louise.udacity.bakingapp.MainActivity;
+import com.louise.udacity.bakingapp.R;
+import com.louise.udacity.bakingapp.RecipeDetailActivity;
 import com.louise.udacity.bakingapp.data.Recipe;
 
 import timber.log.Timber;

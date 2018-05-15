@@ -21,12 +21,14 @@
         </activity>
         <activity
             android:name=".RecipeDetailActivity"
-            android:configChanges="orientation" />
+            android:configChanges="orientation"
+            android:parentActivityName=".MainActivity"/>
         <activity
             android:name=".StepDetailActivity"
-            android:configChanges="orientation|screenSize" />
+            android:configChanges="orientation|screenSize"
+            android:parentActivityName=".RecipeDetailActivity"/>
 
-        <receiver android:name=".MyWidgetProvider">
+        <receiver android:name=".widget.MyWidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -39,7 +41,7 @@
                 android:value="true" />
         </receiver>
 
-        <service android:name=".MyWidgetRemoteViewService"
+        <service android:name=".widget.MyWidgetRemoteViewService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
     </application>
 

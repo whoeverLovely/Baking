@@ -5,10 +5,15 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
@@ -19,31 +24,31 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.louise.udacity.bakingapp.data.Ingredient;
 import com.louise.udacity.bakingapp.data.Recipe;
 import com.louise.udacity.bakingapp.util.ItemClickListener;
 import com.louise.udacity.bakingapp.util.MySingletonVolley;
+import com.louise.udacity.bakingapp.widget.MyWidgetProvider;
 
 import org.json.JSONArray;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class MainActivity extends AppCompatActivity implements ItemClickListener {
+public class MainActivity extends AppCompatActivity implements ItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.recipe_recycler_view)
     RecyclerView recipeRecyclerView;
     @BindView(R.id.main_progress_bar)
     ProgressBar progressBar;
-
+    @BindView(R.id.swiperefresh)
+    SwipeRefreshLayout swipeRefreshLayout;
     RecipeAdapter recipeAdapter;
     List<Recipe> recipes;
 
-    public static final String EXTRA_RECIPE= "recipe";
+    public static final String EXTRA_RECIPE = "recipe";
 
     public static final String URL = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
 
@@ -54,18 +59,26 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
 
         ButterKnife.bind(this);
 
-        recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        if (getResources().getBoolean(R.bool.tablet)) {
+            recipeRecyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        } else {
+            recipeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        }
+
         recipeRecyclerView.setHasFixedSize(true);
         recipeAdapter = new RecipeAdapter(this, this);
         recipeRecyclerView.setAdapter(recipeAdapter);
 
+        progressBar.setVisibility(View.VISIBLE);
         setRecipeData();
+
+        swipeRefreshLayout.setOnRefreshListener(this);
     }
 
     private void setRecipeData() {
 
         Timber.d("Started fetch data...");
-        progressBar.setVisibility(View.VISIBLE);
+
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray response) {
@@ -88,6 +101,25 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         // Access the RequestQueue through your singleton class.
         MySingletonVolley.getInstance(this).addToRequestQueue(jsonArrayRequest);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.menu_refresh:
+                setRecipeData();
+                return true;
+            default:
+                throw new RuntimeException("The item selected is not available.");
+        }
     }
 
     @Override
@@ -117,4 +149,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
         appWidgetManager.updateAppWidget(appWidgetIds, views);
     }
 
+    @Override
+    public void onRefresh() {
+        setRecipeData();
+    }
 }

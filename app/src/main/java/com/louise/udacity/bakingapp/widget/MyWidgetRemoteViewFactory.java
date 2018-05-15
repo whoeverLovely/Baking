@@ -1,4 +1,4 @@
-package com.louise.udacity.bakingapp;
+package com.louise.udacity.bakingapp.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
@@ -6,17 +6,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Binder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
+import com.louise.udacity.bakingapp.MainActivity;
 import com.louise.udacity.bakingapp.R;
 import com.louise.udacity.bakingapp.data.Ingredient;
 import com.louise.udacity.bakingapp.data.Recipe;
+import com.louise.udacity.bakingapp.widget.MyWidgetProvider;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import timber.log.Timber;

@@ -1,11 +1,9 @@
-package com.louise.udacity.bakingapp;
+package com.louise.udacity.bakingapp.widget;
 
 import android.content.Intent;
 import android.widget.RemoteViewsService;
 
-import com.louise.udacity.bakingapp.data.Ingredient;
-
-import java.util.ArrayList;
+import com.louise.udacity.bakingapp.widget.MyWidgetRemoteViewFactory;
 
 public class MyWidgetRemoteViewService extends RemoteViewsService {
 

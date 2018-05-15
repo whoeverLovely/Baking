@@ -6,8 +6,10 @@ import android.content.pm.ConfigurationInfo;
 import android.content.res.Configuration;
 import android.opengl.Visibility;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -68,12 +70,26 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
             }
 
 
-            /*stepDetailFragment.setNextStepButtonVisibility(View.INVISIBLE);*/
-
-
-        } else
+        } else {
             mTwoPane = false;
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            }
 
+        }
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            default:
+                throw new RuntimeException("The menu item selected is unknown.");
+        }
     }
 
     @Override

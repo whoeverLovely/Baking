@@ -3,8 +3,10 @@ package com.louise.udacity.bakingapp;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 
 import com.louise.udacity.bakingapp.data.Step;
 
@@ -48,6 +50,11 @@ public class StepDetailActivity extends AppCompatActivity {
                     .commit();
         }
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
+
     }
 
     @Override
@@ -56,5 +63,17 @@ public class StepDetailActivity extends AppCompatActivity {
 
         //Save the fragment's instance
         getSupportFragmentManager().putFragment(outState, StepDetailFragment.class.getSimpleName(), stepDetailFragment);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+            default:
+                throw new RuntimeException("The menu item selected is unknown.");
+        }
     }
 }
