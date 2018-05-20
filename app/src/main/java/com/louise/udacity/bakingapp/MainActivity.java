@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.support.test.espresso.idling.CountingIdlingResource;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -37,6 +38,10 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
+
 public class MainActivity extends AppCompatActivity implements ItemClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.recipe_recycler_view)
@@ -47,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
     SwipeRefreshLayout swipeRefreshLayout;
     RecipeAdapter recipeAdapter;
     List<Recipe> recipes;
+
+    CountingIdlingResource countingIdlingResource = new CountingIdlingResource("DATA_LOADER");
 
     public static final String EXTRA_RECIPE = "recipe";
 
@@ -78,6 +85,7 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
     private void setRecipeData() {
 
         Timber.d("Started fetch data...");
+        countingIdlingResource.increment();
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(URL, new Response.Listener<JSONArray>() {
             @Override
@@ -87,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
                 }.getType());
                 recipeAdapter.swapData(recipes);
                 progressBar.setVisibility(View.INVISIBLE);
+
+                countingIdlingResource.decrement();
 
             }
         }, new Response.ErrorListener() {
@@ -152,5 +162,15 @@ public class MainActivity extends AppCompatActivity implements ItemClickListener
     @Override
     public void onRefresh() {
         setRecipeData();
+    }
+
+    /**
+     * Only called from test
+     */
+    @VisibleForTesting
+    @NonNull
+    public IdlingResource getCountingIdlingResource() {
+
+        return countingIdlingResource;
     }
 }
