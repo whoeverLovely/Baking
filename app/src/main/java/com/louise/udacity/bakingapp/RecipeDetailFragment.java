@@ -89,11 +89,5 @@ public class RecipeDetailFragment extends Fragment implements ItemClickListener 
 
         onStepClickedListener.onStepSelected(position);
 
-        /*Intent intent = new Intent(getActivity(), StepDetailActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(BUNDLE_STEPS, (ArrayList<Step>) steps);
-        intent.putExtra(EXTRA_BUNDLE_STEPS, bundle);
-        intent.putExtra(EXTRA_INDEX, position);
-        startActivity(intent);*/
     }
 }
