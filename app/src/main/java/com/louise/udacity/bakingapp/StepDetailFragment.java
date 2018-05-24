@@ -39,6 +39,7 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.louise.udacity.bakingapp.data.Step;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -64,6 +65,9 @@ public class StepDetailFragment extends Fragment {
     @BindView(R.id.playerView_frame)
     FrameLayout playerFrame;
 
+    @BindView(R.id.imageView_step_thumbnail)
+    ImageView stepThumbnail;
+
     FrameLayout mFullScreenButton;
 
     private Dialog mFullScreenDialog;
@@ -77,8 +81,12 @@ public class StepDetailFragment extends Fragment {
     private Step currentStep;
     private int index;
     private boolean hasVideo;
+    private long currentPosition;
+    private boolean playState;
 
     public final static String BUNDLE_INDEX = "currentIndex";
+    public final static String BUNDLE_CURRENT_POSITION = "currentPosition";
+    public final static String BUNDLE_PLAY_STATE = "playState";
 
     public StepDetailFragment() {
     }
@@ -103,6 +111,10 @@ public class StepDetailFragment extends Fragment {
 
         if (savedInstanceState != null) {
             index = savedInstanceState.getInt(BUNDLE_INDEX);
+            currentPosition = savedInstanceState.getLong(BUNDLE_CURRENT_POSITION);
+            playState = savedInstanceState.getBoolean(BUNDLE_PLAY_STATE, true);
+
+            Timber.d("currentPosition retrieved from savedInstanceState is " + currentPosition);
         }
 
         return rootView;
@@ -111,15 +123,6 @@ public class StepDetailFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        /*steps = getArguments().getParcelableArrayList(RecipeDetailFragment.BUNDLE_STEPS);*/
-       /* if (savedInstanceState == null) {
-            index = getArguments().getInt(RecipeDetailFragment.EXTRA_INDEX);
-        } else {
-            index = savedInstanceState.getInt(BUNDLE_INDEX);
-        }*/
-       /*if(savedInstanceState != null)
-           index = savedInstanceState.getInt(BUNDLE_INDEX);*/
 
         currentStep = steps.get(index);
         initializePlayer();
@@ -165,15 +168,18 @@ public class StepDetailFragment extends Fragment {
         // When the video is not full screen and new Congfin is landscape and the video source is available, update to full screen mode
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE && !mExoPlayerFullscreen && hasVideo) {
             openFullscreenDialog();
-            Timber.d("should be full screen!!!!!!!!!!!!!!!");
         }
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        Timber.d("the index saved is %s", index);
         outState.putInt(BUNDLE_INDEX, index);
+        outState.putLong(BUNDLE_CURRENT_POSITION, player.getCurrentPosition());
+        outState.putBoolean(BUNDLE_PLAY_STATE, player.getPlayWhenReady());
+
+        Timber.d("the index saved is %s", index);
+        Timber.d("the video position saved %s", player.getCurrentPosition());
 
     }
 
@@ -257,19 +263,31 @@ public class StepDetailFragment extends Fragment {
 
 
     private void setStepViews(Step step) {
-        String url = step.getVideoURL();
-        Timber.d("video url in step detail fragment is %s", url);
-        if ("".equals(url)) {
+        String videoURL = step.getVideoURL();
+        String thumbnailUrl = step.getThumbnailURL();
+        Timber.d("video url in step detail fragment is %s", videoURL);
+        if ("".equals(videoURL)) {
             Timber.d("url is empty");
             hasVideo = false;
+
+            stepThumbnail.setVisibility(View.VISIBLE);
+            if (!"".equals(thumbnailUrl))
+                Picasso.get().load(thumbnailUrl).into(stepThumbnail);
+
             noVideoTextView.setVisibility(View.VISIBLE);
             stepVideoPlayerView.setVisibility(View.GONE);
         } else {
             hasVideo = true;
+            stepThumbnail.setVisibility(View.GONE);
             noVideoTextView.setVisibility(View.GONE);
             stepVideoPlayerView.setVisibility(View.VISIBLE);
-            MediaSource mediaSource = mediaSourceFactory.createMediaSource(Uri.parse(url));
+            MediaSource mediaSource = mediaSourceFactory.createMediaSource(Uri.parse(videoURL));
             player.prepare(mediaSource);
+
+            player.setPlayWhenReady(playState);
+            Timber.d("the current postion in setStepViews is: " + currentPosition);
+            if (currentPosition > 0)
+                player.seekTo(currentPosition);
         }
 
         // Set description

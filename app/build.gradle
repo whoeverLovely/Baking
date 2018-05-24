@@ -65,4 +65,6 @@ dependencies {
     implementation 'com.android.support.test.espresso:espresso-idling-resource:3.0.2'
     androidTestImplementation 'commons-io:commons-io:2.4'
 
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
 }

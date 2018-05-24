@@ -55,6 +55,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements RecipeDet
             if (savedInstanceState != null) {
                 Timber.d("savedInstanceState in activity onCreate is not null");
                 int newIndex = savedInstanceState.getInt(BUNDLE_INDEX);
+
                 Timber.d("index in activity onCreate savedInstance is %s", newIndex);
                 //Restore the fragment's instance
                 stepDetailFragment = (StepDetailFragment) fragmentManager.getFragment(savedInstanceState, StepDetailFragment.class.getSimpleName());
